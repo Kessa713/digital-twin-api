@@ -1,0 +1,20 @@
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# ide
+.idea/
+.vscode/
+workspace.code-workspace
+
+# env
+.env*
+
+# build
+.serverless/
+.webpack/
+
+# scripts
+.sh

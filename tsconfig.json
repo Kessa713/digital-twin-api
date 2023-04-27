@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "target": "ES2022",
+    "module": "ES2022",
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "moduleResolution": "Node",
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}

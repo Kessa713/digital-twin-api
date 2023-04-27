@@ -1,0 +1,48 @@
+service: dt-serverless
+
+# Create an optimized package for our functions
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle # Package our functions with Webpack
+  - serverless-offline
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 1024
+  timeout: 10
+  architecture: x86_64
+  region: ap-southeast-1
+
+  # To load environment variables externally
+  # rename env.example to .env and uncomment
+  # the following line. Also, make sure to not
+  # commit your .env.
+  #
+  #environment:
+  #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
+
+functions:
+  health:
+    handler: src/handler.health
+    events:
+      - http:
+          path: health
+          method: get
+  call-api:
+    handler: src/handler.callApi
+    events:
+      - http:
+          path: api
+          method: post
+  validate-token:
+    handler: src/handler.validateToken
+    events:
+      - http:
+          path: api
+          method: post
+

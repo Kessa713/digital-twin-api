@@ -1,0 +1,3 @@
+call-api;callApi;Call OpenAI API
+validate-token;validateToken;Validate API Token
+health;health;Healthcheck
