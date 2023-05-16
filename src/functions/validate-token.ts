@@ -1,8 +1,7 @@
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
 import { createResponse, createErrorResponse } from '../lib/response';
 import { ThrowableError } from '../lib/error';
-
-const VALID_TOKENS = (process.env.TOKENS ?? '').split(',');
+import { validateKey } from '../lib/validate-key';
 
 export const validateToken: APIGatewayProxyHandlerV2 = async (event) => {
   try {
@@ -12,7 +11,13 @@ export const validateToken: APIGatewayProxyHandlerV2 = async (event) => {
 
     const { token } = JSON.parse(event.body);
 
-    return createResponse({ valid: token && VALID_TOKENS.includes(token) }, ['POST', 'OPTIONS']);
+    if (!token) {
+      throw new ThrowableError(400, 'Token is missing');
+    }
+
+    const [valid, usesRemaining] = await validateKey(token);
+
+    return createResponse({ valid, usesRemaining }, ['POST', 'OPTIONS']);
   } catch (error: unknown) {
     console.error(error instanceof Error ? error.message : String(error).toString());
     if (error instanceof ThrowableError) {
