@@ -8,6 +8,11 @@ plugins:
   - serverless-bundle # Package our functions with Webpack
   - serverless-offline
 
+# Package at a lower concurrency to avoid 100% CPU usage and freezing/crashing machine
+custom:
+  bundle:
+    concurrency: 4
+
 useDotenv: true
 
 provider:

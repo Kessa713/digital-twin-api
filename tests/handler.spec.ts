@@ -25,7 +25,7 @@ describe('API Check', () => {
   it('generate content', async () => {
     const event = {
       body: JSON.stringify({
-        token: 'dmKJq7B8VFVVGX7iSyzrAdQwMXvIacbY',
+        token: 'ZGxEETrcO3u8uJcGoHRS5rgaa5p1RdlV',
         topic: 'Impact of AI on Marketing and Advertising',
       }),
     } as APIGatewayProxyEventV2;
@@ -39,6 +39,7 @@ describe('API Check', () => {
     if (response.body !== undefined) {
       const parsedBody = JSON.parse(response.body);
       expect(parsedBody).to.have.property('result');
+      console.log({ result: parsedBody.result });
     }
   }).timeout(60000);
 });

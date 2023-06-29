@@ -1,5 +1,5 @@
 import { APIGatewayProxyHandlerV2 } from 'aws-lambda';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import UAParser from 'ua-parser-js';
 import { createResponse, createErrorResponse } from '../lib/response';
 import { ThrowableError } from '../lib/error';
@@ -8,14 +8,18 @@ import APILogs from '../db/api-logs';
 
 const { OPENAI_API_KEY } = process.env;
 
+const ORG = {
+  BCF: 'org-AzStsk2SFciFruIs62Yg3vc2',
+  ALGOMO: 'org-g6jQ8VPy55iVg2CcGHdcx5wl',
+};
+
 export const callApi: APIGatewayProxyHandlerV2 = async (event) => {
   try {
     if (!event?.body) {
       throw new ThrowableError(400, 'Request body is empty');
     }
 
-    const ua = new UAParser(event.headers['user-agent']);
-    const ip = event?.headers?.['x-forwarded-for'] ?? '';
+    const ua = event?.headers?.['user-agent'] ? new UAParser(event.headers['user-agent']) : null;
 
     const { topic, token } = JSON.parse(event.body);
 
@@ -49,10 +53,12 @@ export const callApi: APIGatewayProxyHandlerV2 = async (event) => {
       frequency_penalty: 1,
     }, {
       headers: {
+        'OpenAI-Organization': ORG.BCF,
         Authorization: `Bearer ${OPENAI_API_KEY}`,
       },
     });
     const apiCallEndTime = Date.now();
+    console.dir(data, { depth: null });
 
     const resultContent = data.choices?.[0]?.message?.content;
 
@@ -60,9 +66,13 @@ export const callApi: APIGatewayProxyHandlerV2 = async (event) => {
       attributes: {
         key: token,
         datetime: new Date().toISOString(),
-        ip,
-        browser: `${ua.getOS().name} ${ua.getOS().version} - ${ua.getBrowser().name} ${ua.getBrowser().version}`,
-        device: `${ua.getCPU().architecture} - ${ua.getDevice().vendor} ${ua.getDevice().model} ${ua.getDevice().type}`,
+        ...(event?.headers?.['x-forwarded-for'] ? {
+          ip: event?.headers?.['x-forwarded-for'] as string,
+        } : null),
+        ...(ua ? {
+          browser: `${ua.getOS().name} ${ua.getOS().version} - ${ua.getBrowser().name} ${ua.getBrowser().version}`,
+          device: `${ua.getCPU().architecture} - ${ua.getDevice().vendor} ${ua.getDevice().model} ${ua.getDevice().type}`,
+        } : null),
         prompt,
         fullResponse: JSON.stringify(data),
         resultContent,
@@ -77,7 +87,7 @@ export const callApi: APIGatewayProxyHandlerV2 = async (event) => {
     }
     throw new ThrowableError(500, 'Error. Please try again');
   } catch (error: unknown) {
-    console.error(error instanceof Error ? error.message : String(error).toString());
+    console.error(error instanceof AxiosError ? (error?.response?.data ?? error.message) : String(error).toString());
     if (error instanceof ThrowableError) {
       return createErrorResponse(error.status, error.message, ['POST', 'OPTIONS']);
     }

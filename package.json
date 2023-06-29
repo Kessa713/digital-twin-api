@@ -4,7 +4,7 @@
   "main": "src/handler.js",
   "scripts": {
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r dotenv/config",
-    "sync": "ci/create-function.sh && ci/update-function.sh"
+    "sync": "ci/package-function.sh && ci/create-function.sh && ci/update-function.sh"
   },
   "author": "",
   "license": "UNLICENSED",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.109",
-    "@types/chai": "^4.3.4",
+    "@types/chai": "^4.3.5",
     "@types/mocha": "^10.0.1",
     "@types/useragent": "^2.3.1",
     "chai": "^4.3.7",

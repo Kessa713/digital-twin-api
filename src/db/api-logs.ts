@@ -3,12 +3,12 @@ import { Table } from './schema';
 export type APILog = {
   key: string,
   datetime: string,
-  ip: string,
-  browser: string,
-  device: string,
+  ip?: string,
+  browser?: string,
+  device?: string,
   prompt: string,
-  fullResponse: string,
-  resultContent: string,
+  fullResponse?: string,
+  resultContent?: string,
   responseMs: number,
   usagePromptTokens: number;
   usageCompletionTokens: number;

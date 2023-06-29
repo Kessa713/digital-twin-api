@@ -3,8 +3,6 @@
 cd "${0%/*}"
 cd ..
 
-serverless package
-
 while read -r line
 do
   FN_NAME=$(echo "$line" | cut -d ";" -f 1)
